@@ -1,2 +1,6 @@
 include ':android-pdf-viewer'
 include ':sample'
+
+
+
+project(':PdfiumAndroid').projectDir = new File('AndroidPdfViewer/PdfiumAndroid')
