@@ -30,6 +30,8 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     private PDFView pdfView;
     public float currentPos;
 
+    public int offsetStopAt = 0;
+
     private Handler handler = new Handler();
     private Runnable hidePageScrollerRunnable = new Runnable() {
         @Override
@@ -112,7 +114,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
             handler.removeCallbacks(hidePageScrollerRunnable);
         }
         if (pdfView != null) {
-            setPosition((pdfView.isSwipeVertical() ? pdfView.getHeight() : pdfView.getWidth()) * position);
+            setPosition((pdfView.isSwipeVertical() ? pdfView.getHeight() - offsetStopAt : pdfView.getWidth()) * position);
         }
     }
 

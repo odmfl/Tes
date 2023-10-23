@@ -62,6 +62,11 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
+import com.github.barteksc.pdfviewer.listener.OnScaleListener;
+import com.github.barteksc.pdfviewer.listener.OnSearchBeginListener;
+import com.github.barteksc.pdfviewer.listener.OnSearchEndListener;
+import com.github.barteksc.pdfviewer.listener.OnSearchMatchListener;
+import com.github.barteksc.pdfviewer.listener.OnSelectionListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.PagePart;
 import com.github.barteksc.pdfviewer.model.SearchRecord;
@@ -167,7 +172,7 @@ public class PDFView extends RelativeLayout {
 
     public void notifyItemAdded(PDocSearchTask pDocSearchTask, ArrayList<SearchRecord> arr, SearchRecord schRecord, int i) {
         searchRecords.put(i, schRecord);
-
+        this.callbacks.callOnSearchMatch(i, pDocSearchTask.key);
     }
 
     /**
@@ -312,7 +317,7 @@ public class PDFView extends RelativeLayout {
 
     private boolean isScrollHandleInit = false;
 
-    ScrollHandle getScrollHandle() {
+    public ScrollHandle getScrollHandle() {
         return scrollHandle;
     }
 
@@ -469,13 +474,13 @@ public class PDFView extends RelativeLayout {
     }
 
     public void startSearch(ArrayList<SearchRecord> arr, String key, int flag) {
-
+        this.callbacks.callOnSearchBegin();
     }
 
     public void endSearch(ArrayList<SearchRecord> arr) {
-
         selectionPaintView.invalidate();
         // searchHandler.endSearch(arr);
+        this.callbacks.callOnSearchEnd();
     }
 
     public void setSelectionAtPage(int pageIdx, int st, int ed) {
@@ -821,7 +826,6 @@ public class PDFView extends RelativeLayout {
         int curPage = pdfFile.getPageAtOffset(isSwipeVertical() ? mappedY : mappedX, getZoom());
         if (page == -1)
             page = curPage;
-        Log.e("page", page + "");
 
         int pageX = (int) pdfFile.getSecondaryPageOffset(page, getZoom());
         int pageY = (int) pdfFile.getPageOffset(page, getZoom());
@@ -834,8 +838,6 @@ public class PDFView extends RelativeLayout {
     }
 
     public SearchRecord findPageCached(String key, int pageIdx, int flag) {
-
-
         long tid = dragPinchManager.loadText(pageIdx);
         if (tid == -1) {
             return null;
@@ -1113,7 +1115,7 @@ public class PDFView extends RelativeLayout {
         canvas.translate(-currentXOffset, -currentYOffset);
     }
 
-    public String getSelection() throws Exception {
+    public String getSelection() {
         if (selectionPaintView != null) {
             try {
                 if (hasSelection) {
@@ -1129,21 +1131,18 @@ public class PDFView extends RelativeLayout {
                     StringBuilder sb = new StringBuilder();
                     int selCount = 0;
                     for (int i = 0; i <= pageCount; i++) {
-
                         dragPinchManager.prepareText();
                         int len = dragPinchManager.allText.length();
                         selCount += i == 0 ? len - selStart : i == pageCount ? selEnd : len;
                     }
                     sb.ensureCapacity(selCount + 64);
                     for (int i = 0; i <= pageCount; i++) {
-
                         sb.append(dragPinchManager.allText.substring(i == 0 ? selStart : 0, i == pageCount ? selEnd : dragPinchManager.allText.length()));
                     }
                     return sb.toString();
                 }
             } catch (Exception e) {
                 Log.e("get Selection Exception", "Exception", e);
-                throw e;
             }
         }
         return null;
@@ -1864,6 +1863,9 @@ public class PDFView extends RelativeLayout {
         return pdfFile.getPageLinks(page);
     }
 
+    /****************************************************************
+     *  Configurator  Class                                         *
+     ****************************************************************/
     /**
      * Use an asset file as the pdf source
      */
@@ -1933,6 +1935,16 @@ public class PDFView extends RelativeLayout {
         private OnRenderListener onRenderListener;
 
         private OnTapListener onTapListener;
+
+        private OnScaleListener onScaleListener;
+
+        private OnSelectionListener onSelectionListener;
+
+        private OnSearchBeginListener onSearchBeginListener;
+
+        private OnSearchEndListener onSearchEndListener;
+
+        private OnSearchMatchListener onSearchMatchListener;
 
         private OnLongPressListener onLongPressListener;
 
@@ -2041,6 +2053,31 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator onScale(OnScaleListener onScaleListener) {
+            this.onScaleListener = onScaleListener;
+            return this;
+        }
+
+        public Configurator onSelection(OnSelectionListener onSelectionListener) {
+            this.onSelectionListener = onSelectionListener;
+            return this;
+        }
+
+        public Configurator onSearchBegin(OnSearchBeginListener onSearchBeginListener) {
+            this.onSearchBeginListener = onSearchBeginListener;
+            return this;
+        }
+
+        public Configurator onSearchEnd(OnSearchEndListener onSearchEndListener) {
+            this.onSearchEndListener = onSearchEndListener;
+            return this;
+        }
+
+        public Configurator onSearchMatch(OnSearchMatchListener onSearchMatchListener) {
+            this.onSearchMatchListener = onSearchMatchListener;
+            return this;
+        }
+
         public Configurator onLongPress(OnLongPressListener onLongPressListener) {
             this.onLongPressListener = onLongPressListener;
             return this;
@@ -2145,6 +2182,11 @@ public class PDFView extends RelativeLayout {
             PDFView.this.callbacks.setOnPageScroll(onPageScrollListener);
             PDFView.this.callbacks.setOnRender(onRenderListener);
             PDFView.this.callbacks.setOnTap(onTapListener);
+            PDFView.this.callbacks.setOnScale(onScaleListener);
+            PDFView.this.callbacks.setOnSelection(onSelectionListener);
+            PDFView.this.callbacks.setOnSearchBegin(onSearchBeginListener);
+            PDFView.this.callbacks.setOnSearchEnd(onSearchEndListener);
+            PDFView.this.callbacks.setOnSearchMatch(onSearchMatchListener);
             PDFView.this.callbacks.setOnLongPress(onLongPressListener);
             PDFView.this.callbacks.setOnPageError(onPageErrorListener);
             PDFView.this.callbacks.setLinkHandler(linkHandler);
@@ -2154,7 +2196,6 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setDefaultPage(defaultPage);
             PDFView.this.setSwipeVertical(!swipeHorizontal);
             PDFView.this.enableAnnotationRendering(annotationRendering);
-
             PDFView.this.enableAntialiasing(antialiasing);
             PDFView.this.setSpacing(spacing);
             PDFView.this.setSpacingTop(spacingTop);

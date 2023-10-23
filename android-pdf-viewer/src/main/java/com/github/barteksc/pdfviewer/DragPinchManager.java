@@ -519,7 +519,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 //            if (pdfView.hideView != null)
 //                pdfView.hideView.setVisibility(View.VISIBLE);
 //        }
-        Log.e("ScrollY", String.valueOf(distanceY));
+//        Log.e("ScrollY", String.valueOf(distanceY));
         return true;
     }
 
