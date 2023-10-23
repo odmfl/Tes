@@ -25,11 +25,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +34,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.PDocSelection;
@@ -230,7 +230,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         pdfView.setOnSelection(new PDFView.OnSelection() {
             @Override
-            public void onSelection(boolean hasSelection, String text) {
+            public void onSelection(boolean hasSelection) { //, String text) {
                 if (hasSelection) {
                     setTitle("Select Text");
                     setTitleColor(getResources().getColor(android.R.color.holo_blue_bright));
@@ -300,7 +300,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             Cursor cursor = getContentResolver().query(uri, null, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    result = cursor.getString(index);
                 }
             } finally {
                 if (cursor != null) {
@@ -351,6 +352,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions,
+                                         grantResults);
         if (requestCode == PERMISSION_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

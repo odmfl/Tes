@@ -25,10 +25,10 @@ ext {
 }
 */
 android {
-    compileSdkVersion 33
+    compileSdk 33
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 33
     }
     namespace 'com.github.barteksc.pdfviewer'
@@ -36,9 +36,9 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:support-compat:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     //api 'com.github.barteksc:pdfium-android:1.9.0'
-    api project(path: ':AndroidPdfViewer:PdfiumAndroid')
+    api project(path: ':PdfiumAndroid')
 }
 
 //apply from: 'bintray.gradle'
