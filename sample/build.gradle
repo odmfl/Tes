@@ -5,10 +5,10 @@ buildscript {
     }
 }
 
-repositories {
-    google()
-    jcenter()
-}
+//repositories {
+//    google()
+//    jcenter()
+//}
 
 apply plugin: 'com.android.application'
 

@@ -284,7 +284,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnLoadComplete
         pdfFileName = uri != null ? getFileNameFromUri(uri) : assetFileName;
         PDFView.Configurator configurator = (uri != null ? pdfView.fromUri(uri) : pdfView.fromAsset(assetFileName));
         configurator.autoSpacing(false).spacing(10) // in dp
-                .spacingTop(0).spacingBottom(_spacingBottom).enableAnnotationRendering(true).linkHandler(null)
+                .spacingTop(0).spacingBottom(_spacingBottom).enableAnnotationRendering(true)/*.linkHandler(null)*/
                 .scrollHandle(new DefaultScrollHandle(this)).onPageChange(new OnPageChangeListener() {
                     @Override
                     public void onPageChanged(int page, int pageCount) {

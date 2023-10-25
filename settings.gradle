@@ -1,3 +1,21 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
+    }
+}
+
 include ':android-pdf-viewer'
 include ':PdfiumAndroid'
 include ':sample'

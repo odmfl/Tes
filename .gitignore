@@ -33,3 +33,5 @@ local.properties
 
 /.cxx
 .cxx
+
+tmp_remote_config/
