@@ -605,7 +605,7 @@ JNI_FUNC(void, PdfiumCore, nativeRenderPageBitmap)(JNI_ARGS, jlong docPtr, jlong
     DocumentFile *doc = reinterpret_cast<DocumentFile*>(docPtr);
 
     FPDF_FORMFILLINFO formfillinfo;
-    formfillinfo.version = 1;
+    formfillinfo.version = 2;
 
     FPDF_FORMHANDLE formHandle = FPDFDOC_InitFormFillEnvironment(doc->pdfDocument, &formfillinfo);
 
