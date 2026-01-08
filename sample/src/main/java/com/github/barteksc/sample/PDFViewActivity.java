@@ -49,6 +49,7 @@ import com.github.barteksc.pdfviewer.listener.OnSearchMatchListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
+import com.github.barteksc.pdfviewer.util.FitPolicy;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -290,6 +291,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnLoadComplete
                 .swipeHorizontal(true)
                 .pageSnap(true)
                 .pageFling(true)
+                .pageFitPolicy(FitPolicy.BOTH)
                 .scrollHandle(new DefaultScrollHandle(this)).onPageChange(new OnPageChangeListener() {
                     @Override
                     public void onPageChanged(int page, int pageCount) {
