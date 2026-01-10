@@ -63,6 +63,20 @@ public class PagePart {
         this.cacheOrder = cacheOrder;
     }
 
+    public class PagePart {
+
+    private List<RectF> highlightRects;
+
+    public void setHighlightRects(List<RectF> rects) {
+        this.highlightRects = rects;
+    }
+
+    public List<RectF> getHighlightRects() {
+        return highlightRects;
+    }
+}
+
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof PagePart)) {
@@ -78,3 +92,4 @@ public class PagePart {
     }
 
 }
+
