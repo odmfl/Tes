@@ -48,6 +48,33 @@ class RenderingHandler extends Handler {
     private Matrix renderMatrix = new Matrix();
     private boolean running = false;
 
+    private final Paint highlightPaint = new Paint();
+
+private int highlightedPage = -1;
+
+public void setHighlightedPage(int page) {
+    highlightedPage = page;
+    pdfView.invalidate();
+}
+
+@Override
+protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+
+    if (highlightedPage >= 0) {
+        List<PagePart> parts = pdfView.getPageParts();
+
+        for (PagePart part : parts) {
+            if (part.getPage() == highlightedPage && part.getHighlightRects() != null) {
+                for (RectF r : part.getHighlightRects()) {
+                    canvas.drawRect(r, highlightPaint);
+                }
+            }
+        }
+    }
+}
+
+
     RenderingHandler(Looper looper, PDFView pdfView) {
         super(looper);
         this.pdfView = pdfView;
@@ -159,3 +186,4 @@ class RenderingHandler extends Handler {
         }
     }
 }
+
