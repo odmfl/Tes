@@ -1115,6 +1115,41 @@ public class PDFView extends RelativeLayout {
         canvas.translate(-currentXOffset, -currentYOffset);
     }
 
+public class PDFView extends RelativeLayout {
+
+    public static class SearchResult {
+        public final int page;
+        public final int index;
+
+        public SearchResult(int page, int index) {
+            this.page = page;
+            this.index = index;
+        }
+    }
+
+    public List<SearchResult> search(String query) {
+        List<SearchResult> results = new ArrayList<>();
+
+        for (int i = 0; i < pdfFile.getPagesCount(); i++) {
+            String text = pdfFile.getPageText(i);
+            if (text == null) continue;
+
+            int index = text.indexOf(query);
+            while (index >= 0) {
+                results.add(new SearchResult(i, index));
+                index = text.indexOf(query, index + query.length());
+            }
+        }
+        return results;
+    }
+
+    public void highlightSearchResult(SearchResult result) {
+        jumpTo(result.page, true);
+        renderingHandler.setHighlightedPage(result.page);
+    }
+}
+
+
     public String getSelection() {
         if (selectionPaintView != null) {
             try {
@@ -2220,3 +2255,4 @@ public class PDFView extends RelativeLayout {
         void onSelection(boolean hasSelection);
     }
 }
+
