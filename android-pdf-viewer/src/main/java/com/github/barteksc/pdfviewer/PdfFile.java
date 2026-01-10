@@ -345,6 +345,28 @@ class PdfFile {
         originalUserPages = null;
     }
 
+    public class PdfFile {
+
+    private final SparseArray<String> pageText = new SparseArray<>();
+    private final SparseArray<RectF[]> pageTextRects = new SparseArray<>();
+
+    public void extractAllText(PdfiumCore core, PdfDocument doc) {
+        for (int i = 0; i < getPagesCount(); i++) {
+            pageText.put(i, core.getPageText(doc, i));
+            pageTextRects.put(i, core.getPageTextRects(doc, i));
+        }
+    }
+
+    public String getPageText(int page) {
+        return pageText.get(page);
+    }
+
+    public RectF[] getPageTextRects(int page) {
+        return pageTextRects.get(page);
+    }
+}
+
+
     /**
      * Given the UserPage number, this method restrict it
      * to be sure it's an existing page. It takes care of
