@@ -285,6 +285,77 @@ JNI_FUNC(jint, PdfiumCore, nativeGetPageCount)(JNI_ARGS, jlong documentPtr) {
     return (jint) FPDF_GetPageCount(doc->pdfDocument);
 }
 
+// ================= TEXT CONTENT =================
+
+JNIEXPORT jstring JNICALL
+Java_com_shockwave_pdfium_PdfiumCore_nativeGetPageText(
+        JNIEnv *env, jobject,
+        jlong docPtr, jint pageIndex) {
+
+    FPDF_DOCUMENT doc = reinterpret_cast<FPDF_DOCUMENT>(docPtr);
+    FPDF_PAGE page = FPDF_LoadPage(doc, pageIndex);
+    if (!page) return env->NewStringUTF("");
+
+    FPDF_TEXTPAGE textPage = FPDFText_LoadPage(page);
+    int count = FPDFText_CountChars(textPage);
+
+    std::u16string result;
+    for (int i = 0; i < count; i++) {
+        unsigned int c = FPDFText_GetUnicode(textPage, i);
+        result.push_back((char16_t) c);
+    }
+
+    FPDFText_ClosePage(textPage);
+    FPDF_ClosePage(page);
+
+    return env->NewString(reinterpret_cast<const jchar *>(result.c_str()), result.size());
+}
+
+
+// ================= TEXT RECTANGLES =================
+
+JNIEXPORT jobjectArray JNICALL
+Java_com_shockwave_pdfium_PdfiumCore_nativeGetPageTextRects(
+        JNIEnv *env, jobject,
+        jlong docPtr, jint pageIndex) {
+
+    FPDF_DOCUMENT doc = reinterpret_cast<FPDF_DOCUMENT>(docPtr);
+    FPDF_PAGE page = FPDF_LoadPage(doc, pageIndex);
+    if (!page) return nullptr;
+
+    FPDF_TEXTPAGE textPage = FPDFText_LoadPage(page);
+    int count = FPDFText_CountChars(textPage);
+
+    jclass rectFClass = env->FindClass("android/graphics/RectF");
+    jmethodID rectCtor = env->GetMethodID(rectFClass, "<init>", "(FFFF)V");
+
+    jobjectArray rects = env->NewObjectArray(count, rectFClass, nullptr);
+
+    for (int i = 0; i < count; i++) {
+        double left, right, top, bottom;
+        FPDFText_GetCharBox(textPage, i, &left, &right, &bottom, &top);
+
+        jobject rect = env->NewObject(
+                rectFClass,
+                rectCtor,
+                (float) left,
+                (float) top,
+                (float) right,
+                (float) bottom);
+
+        env->SetObjectArrayElement(rects, i, rect);
+    }
+
+    FPDFText_ClosePage(textPage);
+    FPDF_ClosePage(page);
+
+    return rects;
+}
+
+
+
+
+
 JNI_FUNC(void, PdfiumCore, nativeCloseDocument)(JNI_ARGS, jlong documentPtr) {
     DocumentFile *doc = reinterpret_cast<DocumentFile *>(documentPtr);
     delete doc;
