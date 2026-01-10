@@ -89,25 +89,29 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     }
 
     @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        boolean onTapHandled = false;
+public boolean onSingleTapConfirmed(MotionEvent e) {
+    int page = pdfView.getCurrentPage();
 
-        if (pdfView.hasSelection) {
-            pdfView.clearSelection();
-//            if (wordTapped(e.getX(), e.getY(), 1.5f)) {
-//                if (pdfView.onSelection != null) {
-//                    pdfView.onSelection.onSelection(true);
-//                }
-//                draggingHandle = pdfView.handleRight;
-//                sCursorPosStart.set(pdfView.handleRightPos.right, pdfView.handleRightPos.bottom);
-//            } else {
-//            }
-        } else {
-            onTapHandled = pdfView.callbacks.callOnTap(e);
+    RectF[] rects = pdfView.getPdfFile().getPageTextRects(page);
+    if (rects == null) return false;
+
+    float x = e.getX();
+    float y = e.getY();
+
+    List<RectF> selected = new ArrayList<>();
+    for (RectF r : rects) {
+        if (r.contains(x, y)) {
+            selected.add(r);
         }
-        if(pdfView.pdfFile == null){
-            return true;
-        }
+    }
+
+    pdfView.getRenderingHandler().setHighlightedPage(page);
+    return true;
+}
+
+
+
+        
         boolean linkTapped = checkLinkTapped(e.getX(), e.getY());
         if (!onTapHandled && !linkTapped) {
             ScrollHandle ps = pdfView.getScrollHandle();
@@ -758,3 +762,4 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         return pdfView.isSwipeVertical() ? absY > absX : absX > absY;
     }
 }
+
