@@ -46,6 +46,9 @@ public class PdfiumCore {
 
     private native void nativeClosePages(long[] pagesPtr);
 
+    private native String nativeGetPageText(long docPtr, int pageIndex);
+    private native RectF[] nativeGetPageTextRects(long docPtr, int pageIndex);
+
     private native int nativeGetPageWidthPixel(long pagePtr, int dpi);
 
     private native int nativeGetPageHeightPixel(long pagePtr, int dpi);
@@ -333,6 +336,21 @@ public class PdfiumCore {
                 Log.e(TAG, "Exception throw from native");
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    // ================= TEXT EXTRACTION =================
+
+    public String getPageText(PdfDocument doc, int pageIndex) {
+        synchronized (doc.lock) {
+            return nativeGetPageText(doc.mNativeDocPtr, pageIndex);
+        }
+    }
+
+    public RectF[] getPageTextRects(PdfDocument doc, int pageIndex) {
+        synchronized (doc.lock) {
+            return nativeGetPageTextRects(doc.mNativeDocPtr, pageIndex);
         }
     }
 
