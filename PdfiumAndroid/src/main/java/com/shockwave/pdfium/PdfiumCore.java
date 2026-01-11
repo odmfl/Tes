@@ -343,15 +343,15 @@ public class PdfiumCore {
     // ================= TEXT EXTRACTION =================
 
     public String getPageText(PdfDocument doc, int pageIndex) {
-        synchronized (doc.lock) {
+        
             return nativeGetPageText(doc.mNativeDocPtr, pageIndex);
-        }
+        
     }
 
     public RectF[] getPageTextRects(PdfDocument doc, int pageIndex) {
-        synchronized (doc.lock) {
+        
             return nativeGetPageTextRects(doc.mNativeDocPtr, pageIndex);
-        }
+        
     }
 
     /**
